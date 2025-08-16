@@ -1,0 +1,79 @@
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  padding: 8px;
+
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (min-width: 768px) {
+  #root {
+    padding: 16px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  #root {
+    padding: 24px;
+    max-width: 1200px;
+  }
+}
+
+@media (min-width: 1440px) {
+  #root {
+    padding: 32px;
+    max-width: 1440px;
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  #root {
+    padding: 4px;
+    justify-content: center;
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@supports (padding: max(0px)) {
+  #root {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  #root {
+    padding: max(4px, env(safe-area-inset-top))
+      max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom))
+      max(4px, env(safe-area-inset-left));
+  }
+}
+
+@media print {
+  #root {
+    display: none;
+  }
+
+  body::after {
+    content: "This is an interactive game that cannot be printed.";
+    display: block;
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+  }
+}
