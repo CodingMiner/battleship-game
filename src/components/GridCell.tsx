@@ -16,6 +16,50 @@ interface StyledCellProps {
   $disabled: boolean;
 }
 
+const GridCell: React.FC<GridCellProps> = ({
+  cellState,
+  onClick,
+  row,
+  col,
+  disabled = false,
+}) => {
+  const isDisabled = disabled || cellState.isAttacked;
+
+  const handleClick = () => {
+    if (!isDisabled) {
+      onClick();
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if ((event.key === "Enter" || event.key === " ") && !isDisabled) {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
+  return (
+    <StyledCell
+      $isAttacked={cellState.isAttacked}
+      $isHit={cellState.isHit}
+      $disabled={isDisabled}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`Cell ${row + 1}, ${col + 1}${
+        cellState.isAttacked
+          ? cellState.isHit
+            ? " - Hit"
+            : " - Miss"
+          : " - Unattacked"
+      }`}
+      disabled={isDisabled}
+      type="button"
+    />
+  );
+};
+
+export default GridCell;
+
 const StyledCell = styled.button<StyledCellProps>`
   width: ${({ theme }) => theme.grid.mobile.cellSize};
   height: ${({ theme }) => theme.grid.mobile.cellSize};
@@ -281,47 +325,3 @@ const StyledCell = styled.button<StyledCellProps>`
     }
   }
 `;
-
-const GridCell: React.FC<GridCellProps> = ({
-  cellState,
-  onClick,
-  row,
-  col,
-  disabled = false,
-}) => {
-  const isDisabled = disabled || cellState.isAttacked;
-
-  const handleClick = () => {
-    if (!isDisabled) {
-      onClick();
-    }
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if ((event.key === "Enter" || event.key === " ") && !isDisabled) {
-      event.preventDefault();
-      onClick();
-    }
-  };
-
-  return (
-    <StyledCell
-      $isAttacked={cellState.isAttacked}
-      $isHit={cellState.isHit}
-      $disabled={isDisabled}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      aria-label={`Cell ${row + 1}, ${col + 1}${
-        cellState.isAttacked
-          ? cellState.isHit
-            ? " - Hit"
-            : " - Miss"
-          : " - Unattacked"
-      }`}
-      disabled={isDisabled}
-      type="button"
-    />
-  );
-};
-
-export default GridCell;

@@ -59,22 +59,6 @@ Ships are pre-positioned according to the game configuration:
 - **Cruiser** (3 cells): Horizontal at [8,1] - [8,3]
 - **Carrier** (5 cells): Vertical at [2,9] - [6,9]
 
-## 🛠️ Technology Stack
-
-### Core Technologies
-
-- **React 19.1.1**: Modern UI library with latest features
-- **TypeScript 5.8.3**: Type-safe development
-- **Vite 7.1.2**: Fast build tool and development server
-- **styled-components 6.1.19**: CSS-in-JS styling solution
-
-### Development Tools
-
-- **Vitest**: Fast unit testing framework
-- **Testing Library**: React component testing utilities
-- **ESLint**: Code quality and consistency
-- **TypeScript**: Static type checking
-
 ## 🏗️ Project Structure
 
 ```

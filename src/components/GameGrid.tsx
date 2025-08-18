@@ -10,6 +10,37 @@ interface GameGridProps {
   disabled?: boolean;
 }
 
+const GameGrid: React.FC<GameGridProps> = ({
+  board,
+  onCellClick,
+  disabled = false,
+}) => {
+  const handleCellClick = (row: number, col: number) => {
+    if (!disabled) {
+      onCellClick(row, col);
+    }
+  };
+
+  return (
+    <GridContainer role="grid" aria-label="Battleship game board">
+      {board.map((row, rowIndex) =>
+        row.map((cellState, colIndex) => (
+          <GridCell
+            key={`${rowIndex}-${colIndex}`}
+            cellState={cellState}
+            onClick={() => handleCellClick(rowIndex, colIndex)}
+            row={rowIndex}
+            col={colIndex}
+            disabled={disabled}
+          />
+        ))
+      )}
+    </GridContainer>
+  );
+};
+
+export default GameGrid;
+
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(${BOARD_SIZE}, 1fr);
@@ -72,34 +103,3 @@ const GridContainer = styled.div`
     border-color: ${({ theme }) => theme.colors.text};
   }
 `;
-
-const GameGrid: React.FC<GameGridProps> = ({
-  board,
-  onCellClick,
-  disabled = false,
-}) => {
-  const handleCellClick = (row: number, col: number) => {
-    if (!disabled) {
-      onCellClick(row, col);
-    }
-  };
-
-  return (
-    <GridContainer role="grid" aria-label="Battleship game board">
-      {board.map((row, rowIndex) =>
-        row.map((cellState, colIndex) => (
-          <GridCell
-            key={`${rowIndex}-${colIndex}`}
-            cellState={cellState}
-            onClick={() => handleCellClick(rowIndex, colIndex)}
-            row={rowIndex}
-            col={colIndex}
-            disabled={disabled}
-          />
-        ))
-      )}
-    </GridContainer>
-  );
-};
-
-export default GameGrid;

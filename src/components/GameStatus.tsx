@@ -7,6 +7,122 @@ interface GameStatusProps {
   lastAction?: string;
 }
 
+const GameStatus: React.FC<GameStatusProps> = ({ gameState, lastAction }) => {
+  const { ships, gameStatus, totalShots, hits } = gameState;
+
+  const missCount = totalShots - hits;
+  const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 100) : 0;
+
+  const shipsSunk = ships.filter((ship) => ship.isSunk).length;
+
+  const getStatusMessage = (): {
+    message: string;
+    type: "hit" | "miss" | "sunk" | "victory" | "error" | "default";
+  } => {
+    if (gameStatus === "won") {
+      return {
+        message: "🎉 Victory! All ships destroyed! 🎉",
+        type: "victory",
+      };
+    }
+
+    if (lastAction) {
+      if (lastAction.includes("Error:")) {
+        return {
+          message: lastAction,
+          type: "error",
+        };
+      }
+
+      if (
+        lastAction.includes("already fired") ||
+        lastAction.includes("Invalid coordinates") ||
+        lastAction.includes("already complete")
+      ) {
+        return {
+          message: lastAction,
+          type: "error",
+        };
+      }
+
+      const recentlySunkShip = ships.find(
+        (ship) => ship.isSunk && lastAction.includes("Hit")
+      );
+
+      if (recentlySunkShip) {
+        return {
+          message: `${
+            recentlySunkShip.name.charAt(0).toUpperCase() +
+            recentlySunkShip.name.slice(1)
+          } Sunk! 💥`,
+          type: "sunk",
+        };
+      }
+
+      if (lastAction.includes("Hit")) {
+        return {
+          message: "Hit! 🎯",
+          type: "hit",
+        };
+      }
+
+      if (lastAction.includes("Miss")) {
+        return {
+          message: "Miss! 💧",
+          type: "miss",
+        };
+      }
+    }
+
+    return {
+      message: "Click on the grid to fire!",
+      type: "default",
+    };
+  };
+
+  const { message, type } = getStatusMessage();
+
+  return (
+    <StatusContainer>
+      <StatusMessage $type={type}>{message}</StatusMessage>
+
+      <StatsContainer>
+        <StatItem>
+          <StatLabel>Shots Fired</StatLabel>
+          <StatValue>{totalShots}</StatValue>
+        </StatItem>
+        <StatItem>
+          <StatLabel>Hits</StatLabel>
+          <StatValue>{hits}</StatValue>
+        </StatItem>
+        <StatItem>
+          <StatLabel>Misses</StatLabel>
+          <StatValue>{missCount}</StatValue>
+        </StatItem>
+        <StatItem>
+          <StatLabel>Accuracy</StatLabel>
+          <StatValue>{accuracy}%</StatValue>
+        </StatItem>
+      </StatsContainer>
+
+      <ShipsStatus>
+        <ShipsTitle>
+          Ships: {shipsSunk}/{ships.length} Destroyed
+        </ShipsTitle>
+        <ShipsList>
+          {ships.map((ship, index) => (
+            <ShipItem key={`${ship.name}-${index}`} $isSunk={ship.isSunk}>
+              {ship.name}
+            </ShipItem>
+          ))}
+        </ShipsList>
+      </ShipsStatus>
+    </StatusContainer>
+  );
+};
+
+export default GameStatus;
+
 const StatusContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border: 2px solid ${({ theme }) => theme.colors.border};
@@ -308,119 +424,3 @@ const ShipItem = styled.span<{ $isSunk: boolean }>`
     animation: none;
   }
 `;
-
-const GameStatus: React.FC<GameStatusProps> = ({ gameState, lastAction }) => {
-  const { ships, gameStatus, totalShots, hits } = gameState;
-
-  const missCount = totalShots - hits;
-  const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 100) : 0;
-
-  const shipsSunk = ships.filter((ship) => ship.isSunk).length;
-
-  const getStatusMessage = (): {
-    message: string;
-    type: "hit" | "miss" | "sunk" | "victory" | "error" | "default";
-  } => {
-    if (gameStatus === "won") {
-      return {
-        message: "🎉 Victory! All ships destroyed! 🎉",
-        type: "victory",
-      };
-    }
-
-    if (lastAction) {
-      if (lastAction.includes("Error:")) {
-        return {
-          message: lastAction,
-          type: "error",
-        };
-      }
-
-      if (
-        lastAction.includes("already fired") ||
-        lastAction.includes("Invalid coordinates") ||
-        lastAction.includes("already complete")
-      ) {
-        return {
-          message: lastAction,
-          type: "error",
-        };
-      }
-
-      const recentlySunkShip = ships.find(
-        (ship) => ship.isSunk && lastAction.includes("Hit")
-      );
-
-      if (recentlySunkShip) {
-        return {
-          message: `${
-            recentlySunkShip.name.charAt(0).toUpperCase() +
-            recentlySunkShip.name.slice(1)
-          } Sunk! 💥`,
-          type: "sunk",
-        };
-      }
-
-      if (lastAction.includes("Hit")) {
-        return {
-          message: "Hit! 🎯",
-          type: "hit",
-        };
-      }
-
-      if (lastAction.includes("Miss")) {
-        return {
-          message: "Miss! 💧",
-          type: "miss",
-        };
-      }
-    }
-
-    return {
-      message: "Click on the grid to fire!",
-      type: "default",
-    };
-  };
-
-  const { message, type } = getStatusMessage();
-
-  return (
-    <StatusContainer>
-      <StatusMessage $type={type}>{message}</StatusMessage>
-
-      <StatsContainer>
-        <StatItem>
-          <StatLabel>Shots Fired</StatLabel>
-          <StatValue>{totalShots}</StatValue>
-        </StatItem>
-        <StatItem>
-          <StatLabel>Hits</StatLabel>
-          <StatValue>{hits}</StatValue>
-        </StatItem>
-        <StatItem>
-          <StatLabel>Misses</StatLabel>
-          <StatValue>{missCount}</StatValue>
-        </StatItem>
-        <StatItem>
-          <StatLabel>Accuracy</StatLabel>
-          <StatValue>{accuracy}%</StatValue>
-        </StatItem>
-      </StatsContainer>
-
-      <ShipsStatus>
-        <ShipsTitle>
-          Ships: {shipsSunk}/{ships.length} Destroyed
-        </ShipsTitle>
-        <ShipsList>
-          {ships.map((ship, index) => (
-            <ShipItem key={`${ship.name}-${index}`} $isSunk={ship.isSunk}>
-              {ship.name}
-            </ShipItem>
-          ))}
-        </ShipsList>
-      </ShipsStatus>
-    </StatusContainer>
-  );
-};
-
-export default GameStatus;
