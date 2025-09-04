@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import styled from "styled-components";
 import GridCell from "./GridCell";
 import type { CellState } from "../types";
@@ -10,16 +10,28 @@ interface GameGridProps {
   disabled?: boolean;
 }
 
-const GameGrid: React.FC<GameGridProps> = ({
+const GameGrid: React.FC<GameGridProps> = React.memo(({
   board,
   onCellClick,
   disabled = false,
 }) => {
-  const handleCellClick = (row: number, col: number) => {
+  const handleCellClick = useCallback((row: number, col: number) => {
     if (!disabled) {
       onCellClick(row, col);
     }
-  };
+  }, [disabled, onCellClick]);
+
+  // Create stable click handlers for each cell to prevent unnecessary re-renders
+  const cellClickHandlers = useMemo(() => {
+    const handlers: Array<Array<() => void>> = [];
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      handlers[row] = [];
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        handlers[row][col] = () => handleCellClick(row, col);
+      }
+    }
+    return handlers;
+  }, [handleCellClick]);
 
   return (
     <GridContainer role="grid" aria-label="Battleship game board">
@@ -28,7 +40,7 @@ const GameGrid: React.FC<GameGridProps> = ({
           <GridCell
             key={`${rowIndex}-${colIndex}`}
             cellState={cellState}
-            onClick={() => handleCellClick(rowIndex, colIndex)}
+            onClick={cellClickHandlers[rowIndex][colIndex]}
             row={rowIndex}
             col={colIndex}
             disabled={disabled}
@@ -37,7 +49,7 @@ const GameGrid: React.FC<GameGridProps> = ({
       )}
     </GridContainer>
   );
-};
+});
 
 export default GameGrid;
 

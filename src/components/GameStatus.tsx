@@ -8,7 +8,7 @@ interface GameStatusProps {
   lastAction?: string;
 }
 
-const GameStatus: React.FC<GameStatusProps> = ({
+const GameStatus: React.FC<GameStatusProps> = React.memo(({
   gameState,
   lastAction,
   onRestart,
@@ -125,7 +125,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       </ShipsStatus>
     </StatusContainer>
   );
-};
+});
 
 export default GameStatus;
 
