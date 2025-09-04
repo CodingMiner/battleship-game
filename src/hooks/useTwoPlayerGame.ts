@@ -53,7 +53,6 @@ export const useTwoPlayerGame = (initialDifficulty: AIDifficulty = 'medium') => 
 
   const [aiState, setAiState] = useState<AIState>(initializeAI(initialDifficulty));
   const [difficulty, setDifficulty] = useState<AIDifficulty>(initialDifficulty);
-  const [draggedShip, setDraggedShip] = useState<string | null>(null);
   const [battleMessage, setBattleMessage] = useState<string>("");
 
   // Place a ship for the player
@@ -279,7 +278,6 @@ export const useTwoPlayerGame = (initialDifficulty: AIDifficulty = 'medium') => 
     });
     
     setAiState(initializeAI(difficulty));
-    setDraggedShip(null);
   }, []);
 
   // Computed values
@@ -301,15 +299,6 @@ export const useTwoPlayerGame = (initialDifficulty: AIDifficulty = 'medium') => 
   const gamePhase = gameState.phase;
   const currentTurn = gameState.currentTurn;
 
-  // Drag and drop handlers
-  const startDragging = useCallback((shipName: string) => {
-    setDraggedShip(shipName);
-  }, []);
-
-  const stopDragging = useCallback(() => {
-    setDraggedShip(null);
-  }, []);
-
   return {
     gameState,
     gamePhase,
@@ -317,7 +306,6 @@ export const useTwoPlayerGame = (initialDifficulty: AIDifficulty = 'medium') => 
     canStartBattle,
     placedShips,
     unplacedShips,
-    draggedShip,
     battleMessage,
     difficulty,
     
@@ -330,7 +318,5 @@ export const useTwoPlayerGame = (initialDifficulty: AIDifficulty = 'medium') => 
     startBattle,
     attackComputer,
     resetGame,
-    startDragging,
-    stopDragging,
   };
 };

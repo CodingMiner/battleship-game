@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { DndContext } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import ShipPlacementBoard from './ShipPlacementBoard';
 import ShipSelector from './ShipSelector';
 import PlacementControls from './PlacementControls';
@@ -16,7 +18,6 @@ interface ShipPlacementPhaseProps {
   placedShips: TwoPlayerShip[];
   unplacedShips: TwoPlayerShip[];
   canStartBattle: boolean;
-  draggedShip: string | null;
   difficulty: AIDifficulty;
   onShipPlace: (shipName: string, position: Position, orientation: ShipOrientation) => PlacementValidation;
   onShipRemove: (shipName: string) => void;
@@ -25,8 +26,6 @@ interface ShipPlacementPhaseProps {
   onDifficultyChange: (difficulty: AIDifficulty) => void;
   onStartBattle: () => void;
   onResetPlacement: () => void;
-  onDragStart: (shipName: string) => void;
-  onDragEnd: () => void;
 }
 
 const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
@@ -34,7 +33,6 @@ const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
   placedShips,
   unplacedShips,
   canStartBattle,
-  draggedShip,
   difficulty,
   onShipPlace,
   onShipRemove,
@@ -43,11 +41,26 @@ const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
   onDifficultyChange,
   onStartBattle,
   onResetPlacement,
-  onDragStart,
-  onDragEnd,
 }) => {
+  const handleDragStart = (_event: DragStartEvent) => {
+    // We can access the dragged item via _event.active.id
+  };
+  
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const shipName = active.id as string;
+      const dropData = over.data.current;
+      
+      if (dropData && dropData.position) {
+        onShipPlace(shipName, dropData.position, 'horizontal');
+      }
+    }
+  };
   return (
-    <PlacementContainer>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <PlacementContainer>
       <PhaseHeader>
         <Title>Fleet Deployment</Title>
         <Subtitle>
@@ -73,11 +86,8 @@ const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
         <BoardSection>
           <ShipPlacementBoard
             ships={ships}
-            onShipPlace={onShipPlace}
             onShipRemove={onShipRemove}
             onShipRotate={onShipRotate}
-            draggedShip={draggedShip}
-            onDragEnd={onDragEnd}
           />
         </BoardSection>
         
@@ -85,9 +95,6 @@ const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
           <ShipSelector
             unplacedShips={unplacedShips}
             placedShips={placedShips}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            draggedShip={draggedShip}
           />
         </SidebarSection>
       </ContentLayout>
@@ -104,6 +111,7 @@ const ShipPlacementPhase: React.FC<ShipPlacementPhaseProps> = ({
         />
       </ControlsSection>
     </PlacementContainer>
+    </DndContext>
   );
 };
 

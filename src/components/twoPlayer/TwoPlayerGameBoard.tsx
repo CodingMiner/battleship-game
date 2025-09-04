@@ -18,7 +18,6 @@ const TwoPlayerGameBoard: React.FC<TwoPlayerGameBoardProps> = ({
     canStartBattle,
     placedShips,
     unplacedShips,
-    draggedShip,
     battleMessage,
     difficulty: currentDifficulty,
     
@@ -31,8 +30,6 @@ const TwoPlayerGameBoard: React.FC<TwoPlayerGameBoardProps> = ({
     startBattle,
     attackComputer,
     resetGame,
-    startDragging,
-    stopDragging,
   } = useTwoPlayerGame(difficulty);
 
   const renderGamePhase = () => {
@@ -44,7 +41,6 @@ const TwoPlayerGameBoard: React.FC<TwoPlayerGameBoardProps> = ({
             placedShips={placedShips}
             unplacedShips={unplacedShips}
             canStartBattle={canStartBattle}
-            draggedShip={draggedShip}
             difficulty={currentDifficulty}
             onShipPlace={placePlayerShip}
             onShipRemove={removePlayerShip}
@@ -53,8 +49,6 @@ const TwoPlayerGameBoard: React.FC<TwoPlayerGameBoardProps> = ({
             onDifficultyChange={updateDifficulty}
             onStartBattle={startBattle}
             onResetPlacement={resetGame}
-            onDragStart={startDragging}
-            onDragEnd={stopDragging}
           />
         );
         

@@ -1,67 +1,32 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import DraggableShip from './DraggableShip';
 import type { TwoPlayerShip, ShipPlacementData } from '../../types/twoPlayerGame';
 import { SHIP_PLACEMENT_DATA } from '../../types/twoPlayerGame';
 
 interface ShipSelectorProps {
   unplacedShips: TwoPlayerShip[];
   placedShips: TwoPlayerShip[];
-  onDragStart: (shipName: string) => void;
-  onDragEnd: () => void;
-  draggedShip: string | null;
 }
 
 const ShipSelector: React.FC<ShipSelectorProps> = ({
   unplacedShips,
   placedShips,
-  onDragStart,
-  onDragEnd,
-  draggedShip,
 }) => {
   const getShipAssetData = useCallback((shipName: string): ShipPlacementData | undefined => {
     return SHIP_PLACEMENT_DATA.find(data => data.name === shipName);
   }, []);
 
-  const handleDragStart = useCallback((e: React.DragEvent, ship: TwoPlayerShip) => {
-    e.dataTransfer.setData('text/plain', ship.name);
-    e.dataTransfer.effectAllowed = 'move';
-    onDragStart(ship.name);
-  }, [onDragStart]);
-
-  const handleDragEnd = useCallback(() => {
-    onDragEnd();
-  }, [onDragEnd]);
-
   const renderShip = (ship: TwoPlayerShip, isPlaced: boolean) => {
     const assetData = getShipAssetData(ship.name);
-    const isDragging = draggedShip === ship.name;
 
     return (
-      <ShipItem
+      <DraggableShip
         key={ship.name}
-        $isPlaced={isPlaced}
-        $isDragging={isDragging}
-        draggable={!isPlaced}
-        onDragStart={(e) => !isPlaced && handleDragStart(e, ship)}
-        onDragEnd={handleDragEnd}
-        title={
-          isPlaced 
-            ? `${ship.name} (${ship.size} cells) - Placed`
-            : `${ship.name} (${ship.size} cells) - Drag to place`
-        }
-      >
-        <ShipImage
-          src={assetData?.assetPath}
-          alt={`${ship.name} ship`}
-          $orientation={ship.orientation}
-          $isPlaced={isPlaced}
-        />
-        <ShipInfo>
-          <ShipName>{ship.name}</ShipName>
-          <ShipSize>{ship.size} cells</ShipSize>
-          {isPlaced && <PlacedIndicator>✓ Placed</PlacedIndicator>}
-        </ShipInfo>
-      </ShipItem>
+        ship={ship}
+        assetData={assetData}
+        isPlaced={isPlaced}
+      />
     );
   };
 
@@ -172,99 +137,6 @@ const SectionTitle = styled.h4`
   }
 `;
 
-const ShipItem = styled.div<{ $isPlaced: boolean; $isDragging: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  padding: ${({ theme }) => theme.spacing.sm};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  background-color: ${({ theme }) => theme.colors.background};
-  
-  transition: all ${({ theme }) => theme.transitions.fast};
-  cursor: ${({ $isPlaced }) => $isPlaced ? 'default' : 'grab'};
-  opacity: ${({ $isDragging, $isPlaced }) => {
-    if ($isDragging) return 0.5;
-    if ($isPlaced) return 0.7;
-    return 1;
-  }};
-  
-  &:hover {
-    ${({ $isPlaced, theme }) => !$isPlaced && `
-      background-color: ${theme.colors.backgroundDark};
-      border-color: ${theme.colors.borderActive};
-      transform: translateY(-1px);
-      box-shadow: ${theme.shadows.medium};
-    `}
-  }
-  
-  &:active {
-    cursor: ${({ $isPlaced }) => $isPlaced ? 'default' : 'grabbing'};
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    &:hover {
-      transform: none;
-    }
-  }
-`;
-
-const ShipImage = styled.img<{ $orientation: string; $isPlaced: boolean }>`
-  width: 40px;
-  height: auto;
-  max-height: 24px;
-  object-fit: contain;
-  
-  transform: ${({ $orientation }) => 
-    $orientation === 'vertical' ? 'rotate(90deg)' : 'none'
-  };
-  
-  filter: ${({ $isPlaced }) => 
-    $isPlaced ? 'grayscale(0.5) opacity(0.8)' : 'none'
-  };
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    width: 48px;
-    max-height: 28px;
-  }
-`;
-
-const ShipInfo = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-const ShipName = styled.div`
-  font-size: ${({ theme }) => theme.typography.mobile.body};
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
-  text-transform: capitalize;
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: ${({ theme }) => theme.typography.tablet.body};
-  }
-`;
-
-const ShipSize = styled.div`
-  font-size: ${({ theme }) => theme.typography.mobile.small};
-  color: ${({ theme }) => theme.colors.textLight};
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: ${({ theme }) => theme.typography.tablet.small};
-  }
-`;
-
-const PlacedIndicator = styled.div`
-  font-size: ${({ theme }) => theme.typography.mobile.small};
-  color: ${({ theme }) => theme.colors.success};
-  font-weight: 600;
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: ${({ theme }) => theme.typography.tablet.small};
-  }
-`;
 
 const Instructions = styled.div`
   margin-top: ${({ theme }) => theme.spacing.md};
