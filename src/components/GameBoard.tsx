@@ -75,11 +75,20 @@ const GameBoard: React.FC = () => {
     return gameState.gameStatus === "won";
   }, [gameState.gameStatus]);
 
+  const handleRestart = useCallback(() => {
+    setGameState(initialGameState);
+    setLastAction("");
+  }, [initialGameState]);
+
   return (
     <GameBoardContainer>
       <GameTitle>Battleship Game</GameTitle>
 
-      <GameStatus gameState={gameState} lastAction={lastAction} />
+      <GameStatus
+        gameState={gameState}
+        lastAction={lastAction}
+        onRestart={handleRestart}
+      />
 
       <GameGrid
         board={gameState.board}

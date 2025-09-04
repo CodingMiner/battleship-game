@@ -4,10 +4,15 @@ import type { GameState } from "../types";
 
 interface GameStatusProps {
   gameState: GameState;
+  onRestart: () => void;
   lastAction?: string;
 }
 
-const GameStatus: React.FC<GameStatusProps> = ({ gameState, lastAction }) => {
+const GameStatus: React.FC<GameStatusProps> = ({
+  gameState,
+  lastAction,
+  onRestart,
+}) => {
   const { ships, gameStatus, totalShots, hits } = gameState;
 
   const missCount = totalShots - hits;
@@ -116,6 +121,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, lastAction }) => {
             </ShipItem>
           ))}
         </ShipsList>
+        <RestartButton onClick={onRestart}>Restart Game</RestartButton>
       </ShipsStatus>
     </StatusContainer>
   );
@@ -368,6 +374,13 @@ const ShipsList = styled.div`
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     gap: ${({ theme }) => theme.spacing.sm};
   }
+`;
+const RestartButton = styled.button`
+  margin-top: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.white};
 `;
 
 const ShipItem = styled.span<{ $isSunk: boolean }>`
