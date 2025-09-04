@@ -1,84 +1,17 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React from "react";
 import styled from "styled-components";
 import GameGrid from "./GameGrid";
 import GameStatus from "./GameStatus";
-import { gameData } from "../data/shipLayout";
-import {
-  createEmptyBoard,
-  initializeShips,
-  attackCell,
-  validateShipLayout,
-} from "../utils/gameLogic";
-import type { GameState, Ship } from "../types";
+import { useGameState } from "../hooks/useGameState";
 
 const GameBoard: React.FC = () => {
-  const initialGameState = useMemo((): GameState => {
-    const board = createEmptyBoard();
-    let ships: Ship[] = [];
-
-    try {
-      const shipValidation = validateShipLayout(gameData.layout);
-
-      if (!shipValidation || !shipValidation.isValid) {
-        console.error(
-          "Ship layout validation failed:",
-          shipValidation?.errors || ["Unknown validation error"]
-        );
-
-        ships = [];
-      } else {
-        ships = initializeShips(gameData.layout);
-      }
-    } catch (error) {
-      console.error("Error during ship initialization:", error);
-      ships = [];
-    }
-
-    return {
-      board,
-      ships,
-      gameStatus: "playing",
-      totalShots: 0,
-      hits: 0,
-    };
-  }, []);
-
-  const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const [lastAction, setLastAction] = useState<string>("");
-
-  const handleCellClick = useCallback(
-    (row: number, col: number) => {
-      const attackResult = attackCell(row, col, gameState);
-
-      switch (attackResult.result) {
-        case "game_over":
-        case "duplicate":
-        case "out_of_bounds":
-          setLastAction(attackResult.message);
-          return;
-
-        case "hit":
-        case "miss":
-          setGameState(attackResult.gameState);
-          setLastAction(attackResult.message);
-          break;
-
-        default:
-          setLastAction("An unexpected error occurred. Please try again.");
-          return;
-      }
-    },
-    [gameState]
-  );
-
-  const isGameDisabled = useMemo(() => {
-    return gameState.gameStatus === "won";
-  }, [gameState.gameStatus]);
-
-  const handleRestart = useCallback(() => {
-    setGameState(initialGameState);
-    setLastAction("");
-  }, [initialGameState]);
+  const {
+    gameState,
+    lastAction,
+    isGameWon,
+    handleAttack,
+    handleRestart,
+  } = useGameState();
 
   return (
     <GameBoardContainer>
@@ -92,8 +25,8 @@ const GameBoard: React.FC = () => {
 
       <GameGrid
         board={gameState.board}
-        onCellClick={handleCellClick}
-        disabled={isGameDisabled}
+        onCellClick={handleAttack}
+        disabled={isGameWon}
       />
     </GameBoardContainer>
   );

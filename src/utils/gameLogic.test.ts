@@ -116,7 +116,7 @@ describe("gameLogic", () => {
           ship: "destroyer",
           positions: [
             [0, 0],
-            [1, 0],
+            [1] as unknown as [number, number], // Invalid position - missing col
           ],
         },
       ];
