@@ -377,10 +377,61 @@ const ShipsList = styled.div`
 `;
 const RestartButton = styled.button`
   margin-top: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  border: none;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colors.success};
   color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.typography.mobile.body};
+  font-weight: bold;
+  cursor: pointer;
+  transition: all ${({ theme }) => theme.transitions.fast};
+  box-shadow: ${({ theme }) => theme.shadows.small};
+  
+  min-height: ${({ theme }) => theme.touch.minTarget};
+  min-width: 120px;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.successLight};
+    box-shadow: ${({ theme }) => theme.shadows.medium};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: ${({ theme }) => theme.shadows.small};
+  }
+
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.colors.borderActive};
+    outline-offset: 2px;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobileLarge}) {
+    font-size: ${({ theme }) => theme.typography.tablet.body};
+    padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: ${({ theme }) => theme.typography.tablet.body};
+    min-width: 140px;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+    font-size: ${({ theme }) => theme.typography.desktop.body};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+
+    &:active {
+      transform: none;
+    }
+  }
 `;
 
 const ShipItem = styled.span<{ $isSunk: boolean }>`
