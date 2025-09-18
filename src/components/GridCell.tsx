@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import type { CellState } from "../types";
 
@@ -16,7 +16,7 @@ interface StyledCellProps {
   $disabled: boolean;
 }
 
-const GridCell: React.FC<GridCellProps> = ({
+const GridCell: React.FC<GridCellProps> = React.memo(({
   cellState,
   onClick,
   row,
@@ -25,18 +25,18 @@ const GridCell: React.FC<GridCellProps> = ({
 }) => {
   const isDisabled = disabled || cellState.isAttacked;
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!isDisabled) {
       onClick();
     }
-  };
+  }, [isDisabled, onClick]);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if ((event.key === "Enter" || event.key === " ") && !isDisabled) {
       event.preventDefault();
       onClick();
     }
-  };
+  }, [isDisabled, onClick]);
 
   return (
     <StyledCell
@@ -56,7 +56,7 @@ const GridCell: React.FC<GridCellProps> = ({
       type="button"
     />
   );
-};
+});
 
 export default GridCell;
 
